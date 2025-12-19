@@ -1,0 +1,231 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  titleAr     String?  @map("title_ar")
+  titleFr     String?  @map("title_fr")
+  description String
+  descriptionAr String? @map("description_ar")
+  descriptionFr String? @map("description_fr")
+  
+  // Pricing
+  priceUSD    Float    @map("price_usd")
+  priceLBP    Float?   @map("price_lbp")
+  
+  // Location
+  country     String   @default("Lebanon")
+  city        String
+  neighborhood String?
+  address     String?
+  latitude    Float?
+  longitude   Float?
+  
+  // Property Details
+  propertyType String  @map("property_type") // apartment, villa, penthouse, commercial
+  bedrooms    Int
+  bathrooms   Int
+  areaSqm     Float    @map("area_sqm")
+  areaSqft    Float?   @map("area_sqft")
+  yearBuilt   Int?     @map("year_built")
+  floor       Int?
+  totalFloors Int?     @map("total_floors")
+  
+  // Features
+  seaView     Boolean  @default(false) @map("sea_view")
+  hasSolar    Boolean  @default(false) @map("has_solar")
+  hasGenerator Boolean @default(false) @map("has_generator")
+  hasAC       Boolean  @default(false) @map("has_ac")
+  hasElevator Boolean  @default(false) @map("has_elevator")
+  hasParking  Boolean  @default(false) @map("has_parking")
+  hasGarden   Boolean  @default(false) @map("has_garden")
+  hasPool     Boolean  @default(false) @map("has_pool")
+  furnished   Boolean  @default(false)
+  
+  // Investment Data
+  rentalYield     Float? @map("rental_yield")
+  capitalAppreciation Float? @map("capital_appreciation")
+  
+  // Listing Type
+  listingType String   @default("sale") @map("listing_type") // sale, rent, both
+  
+  // Status
+  status      String   @default("available") // available, sold, pending, off_market, rented
+  featured    Boolean  @default(false)
+  
+  // Rental Info (if listingType includes rent)
+  rentPriceUSD Float?  @map("rent_price_usd")
+  rentPriceLBP Float?  @map("rent_price_lbp")
+  rentPeriod   String? @map("rent_period") // monthly, yearly
+  
+  // Media
+  images      String   @default("[]") // JSON array of image URLs
+  videoUrl    String?  @map("video_url")
+  
+  // Relations
+  agentId     String   @map("agent_id")
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  favorites   Favorite[]
+  
+  // Timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@index([city])
+  @@index([propertyType])
+  @@index([status])
+  @@index([featured])
+  @@index([agentId])
+  @@map("properties")
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  nameAr      String?  @map("name_ar")
+  nameFr      String?  @map("name_fr")
+  email       String   @unique
+  phone       String
+  whatsapp    String?
+  bio         String?
+  bioAr       String?  @map("bio_ar")
+  bioFr       String?  @map("bio_fr")
+  
+  // Profile
+  photo       String?  // URL to profile photo
+  languages   String   @default("[]") // JSON array of languages spoken (en, ar, fr)
+  specialties String   @default("[]") // JSON array of specialties
+  
+  // Stats
+  propertiesSold Int   @default(0) @map("properties_sold")
+  yearsExperience Int  @default(0) @map("years_experience")
+  
+  // Social
+  linkedin    String?
+  instagram   String?
+  facebook    String?
+  
+  // Relations
+  properties  Property[]
+  
+  // Timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("agents")
+}
+
+model Location {
+  id          String   @id @default(cuid())
+  name        String
+  nameAr      String?  @map("name_ar")
+  nameFr      String?  @map("name_fr")
+  type        String   // country, city, neighborhood
+  parentId    String?  @map("parent_id")
+  parent      Location? @relation("LocationTree", fields: [parentId], references: [id])
+  children    Location[] @relation("LocationTree")
+  
+  // Coordinates
+  latitude    Float?
+  longitude   Float?
+  
+  // Metadata
+  description String?
+  image       String?
+  
+  // Timestamps
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@index([type])
+  @@index([parentId])
+  @@map("locations")
+}
+
+model Newsletter {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String?
+  subscribed  Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("newsletters")
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String?
+  message     String
+  propertyId  String?  @map("property_id")
+  agentId     String?  @map("agent_id")
+  status      String   @default("new") // new, read, replied, archived
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("contacts")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password      String
+  name          String
+  phone         String?
+  role          String   @default("buyer") // buyer, seller, admin
+  emailVerified DateTime? @map("email_verified")
+  
+  // Profile
+  photo         String?
+  bio           String?
+  
+  // Relations
+  favorites     Favorite[]
+  savedSearches SavedSearch[]
+  
+  // Timestamps
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  @@map("users")
+}
+
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String   @map("property_id")
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @map("created_at")
+  
+  @@unique([userId, propertyId])
+  @@map("favorites")
+}
+
+model SavedSearch {
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  filters     String   @default("{}") // JSON string of search filters
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  @@map("saved_searches")
+}
+

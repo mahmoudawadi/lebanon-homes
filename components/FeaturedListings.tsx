@@ -30,7 +30,7 @@ const FeaturedListings = () => {
   const t = translations[language] || translations.en;
 
   return (
-    <section className="section">
+    <section id="featured" className="section scroll-mt-20">
       <div className="container-x">
         <SectionHeading
           eyebrow={t.eyebrow}

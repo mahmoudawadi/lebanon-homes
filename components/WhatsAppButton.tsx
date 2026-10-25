@@ -3,18 +3,18 @@
 import React from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { whatsappLink } from "@/lib/site";
 
 const WhatsAppButton = () => {
   const { language } = useLanguage();
   
-  const phoneNumber = "9611234567"; // Replace with actual WhatsApp number
   const messages = {
     en: "Hello, I'm interested in your properties.",
     ar: "مرحبا، أنا مهتم بعقاراتكم.",
     fr: "Bonjour, je suis intéressé par vos propriétés.",
   };
 
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(messages[language])}`;
+  const whatsappUrl = whatsappLink(messages[language]);
 
   return (
     <a

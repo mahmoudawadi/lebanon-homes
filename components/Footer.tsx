@@ -7,6 +7,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaXTwitter, FaYoutube } from "react-icons/fa6";
 import { LuMail, LuPhone, LuMapPin, LuArrowRight } from "react-icons/lu";
 import { Logo } from "./MainHeader";
+import { FaWhatsapp } from "react-icons/fa";
+import { WHATSAPP_DISPLAY, whatsappLink } from "@/lib/site";
 
 const translations = {
   en: {
@@ -221,6 +223,10 @@ const Footer = () => {
             <li className="flex items-center gap-3">
               <LuPhone className="h-4 w-4 text-brass-400" />
               <a href="tel:+9611234567" dir="ltr" className="hover:text-white">+961 1 234 567</a>
+            </li>
+            <li className="flex items-center gap-3">
+              <FaWhatsapp className="h-4 w-4 text-brass-400" />
+              <a href={whatsappLink()} target="_blank" rel="noopener noreferrer" dir="ltr" className="hover:text-white">{WHATSAPP_DISPLAY}</a>
             </li>
             <li className="flex items-center gap-3">
               <LuMail className="h-4 w-4 text-brass-400" />

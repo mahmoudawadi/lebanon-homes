@@ -6,6 +6,7 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { LuTrendingUp, LuTrendingDown, LuMapPin, LuLayers, LuBadgeCheck, LuDollarSign } from "react-icons/lu";
 import { formatMoney } from "@/lib/format";
 import SectionHeading from "./SectionHeading";
+import { Reveal } from "./Motion";
 
 const translations = {
   en: {
@@ -67,12 +68,13 @@ const AIMarketInsights = () => {
 
   if (!loading && !insights) return null;
 
-  const cardClass = "rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur transition hover:border-brass/40 hover:bg-white/[0.07]";
+  const cardClass = "rounded-2xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur transition hover:-translate-y-1 hover:border-brass/40 hover:bg-white/[0.07] duration-300";
   const iconClass = "grid h-10 w-10 place-items-center rounded-full bg-brass/15 text-brass-400";
 
   return (
     <section className="section relative overflow-hidden bg-ink text-white">
-      <div className="pointer-events-none absolute -end-40 -top-40 h-96 w-96 rounded-full bg-brass/20 blur-3xl" />
+      <div className="animate-float-slow pointer-events-none absolute -end-40 -top-40 h-96 w-96 rounded-full bg-brass/20 blur-3xl" />
+      <div className="animate-float pointer-events-none absolute -bottom-40 -start-40 h-96 w-96 rounded-full bg-sky-400/10 blur-3xl" />
       <div className="container-x relative">
         <SectionHeading eyebrow={t.eyebrow} title={t.title} lead={t.subtitle} light />
 
@@ -83,7 +85,7 @@ const AIMarketInsights = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <Reveal className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <div className={cardClass}>
               <span className={iconClass}><LuDollarSign className="h-5 w-5" /></span>
               <div className="mt-5 text-xs font-semibold uppercase tracking-wider text-white/50">{t.avgPrice}</div>
@@ -127,7 +129,7 @@ const AIMarketInsights = () => {
               <div className="mt-1 font-serif text-3xl font-semibold">{insights.bestDealsCount}</div>
               <div className="mt-2 text-sm text-white/60">{t.belowMarket}</div>
             </div>
-          </div>
+          </Reveal>
         )}
       </div>
     </section>

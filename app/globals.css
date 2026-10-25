@@ -98,6 +98,81 @@
   }
 }
 
+@layer utilities {
+  /* Warm gold gradient for highlighted words */
+  .text-gradient {
+    background: linear-gradient(100deg, #e9cf9f 0%, #c4a575 40%, #f3e2c0 60%, #b08d57 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shine 6s linear infinite;
+  }
+
+  .glass {
+    @apply border border-white/20 bg-white/10 backdrop-blur-xl;
+  }
+
+  .animate-kenburns {
+    animation: kenburns 24s ease-in-out infinite alternate;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float 8s ease-in-out infinite;
+    animation-delay: -3s;
+  }
+
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes kenburns {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.12) translate(-1.5%, -1%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-gradient,
+  .animate-kenburns,
+  .animate-float,
+  .animate-float-slow,
+  .animate-marquee,
+  .animate-fade-up {
+    animation: none !important;
+  }
+}
+
 /* RTL support */
 [dir="rtl"] .eyebrow::before {
   order: 1;

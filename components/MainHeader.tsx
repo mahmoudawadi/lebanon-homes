@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LuMenu, LuX, LuUser, LuLogOut, LuChevronDown } from "react-icons/lu";
+import { motion, useScroll, useSpring } from "framer-motion";
 
 type Labels = { en: string; ar: string; fr: string };
 
@@ -41,6 +42,8 @@ const MainHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -130,6 +133,12 @@ const MainHeader = () => {
           {mobileMenuOpen ? <LuX className="h-5 w-5" /> : <LuMenu className="h-5 w-5" />}
         </button>
       </div>
+
+      {/* Reading progress */}
+      <motion.div
+        className="absolute inset-x-0 -bottom-px h-0.5 origin-left bg-gradient-to-r from-brass-400 via-brass to-brass-600 rtl:origin-right"
+        style={{ scaleX: progress }}
+      />
 
       {mobileMenuOpen && (
         <div className="border-t border-line bg-ivory xl:hidden">

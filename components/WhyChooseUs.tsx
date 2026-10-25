@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LuShieldCheck, LuScale, LuGlobe, LuArrowRight } from "react-icons/lu";
+import { Reveal, CountUp } from "./Motion";
 
 const translations = {
   en: {
@@ -51,30 +52,30 @@ const WhyChooseUs = () => {
   return (
     <section className="section bg-white">
       <div className="container-x grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
-        <div className="relative">
-          <div className="aspect-[4/5] overflow-hidden rounded-3xl">
+        <Reveal className="relative">
+          <div className="group aspect-[4/5] overflow-hidden rounded-[2rem]">
             <img
               src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80"
               alt=""
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover transition-transform duration-[1.5s] group-hover:scale-105"
               loading="lazy"
             />
           </div>
-          <div className="absolute -bottom-6 end-6 max-w-[220px] rounded-2xl bg-ink p-6 text-white shadow-lift md:-end-6">
-            <div className="font-serif text-5xl font-semibold text-brass-400">15+</div>
+          <div className="animate-float absolute -bottom-6 end-6 max-w-[220px] rounded-2xl bg-ink p-6 text-white shadow-lift md:-end-6">
+            <CountUp value="15+" className="block font-serif text-5xl font-semibold text-brass-400" />
             <div className="mt-2 text-sm text-white/70">{t.years}</div>
           </div>
-        </div>
+        </Reveal>
 
-        <div>
+        <Reveal delay={0.1}>
           <span className="eyebrow">{t.eyebrow}</span>
           <h2 className="section-title mt-4">{t.title}</h2>
           <p className="section-lead">{t.subtitle}</p>
 
           <div className="mt-10 space-y-8">
             {features.map((feature) => (
-              <div key={feature.title} className="flex gap-5">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brass-50 text-brass-600 ring-1 ring-brass-100">
+              <div key={feature.title} className="group flex gap-5">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-brass-50 text-brass-600 ring-1 ring-brass-100 transition-all duration-300 group-hover:scale-110 group-hover:bg-brass group-hover:text-white">
                   <feature.icon className="h-5 w-5" />
                 </span>
                 <div>
@@ -89,7 +90,7 @@ const WhyChooseUs = () => {
             {t.cta}
             <LuArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" />
           </Link>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

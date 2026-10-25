@@ -1,4 +1,5 @@
 import React from "react";
+import { Reveal } from "./Motion";
 
 interface SectionHeadingProps {
   eyebrow?: string;
@@ -12,7 +13,7 @@ interface SectionHeadingProps {
 const SectionHeading = ({ eyebrow, title, lead, align = "start", light = false, action }: SectionHeadingProps) => {
   const centered = align === "center";
   return (
-    <div
+    <Reveal
       className={`mb-12 flex flex-col gap-6 md:mb-14 ${
         centered ? "items-center text-center" : "md:flex-row md:items-end md:justify-between"
       }`}
@@ -23,7 +24,7 @@ const SectionHeading = ({ eyebrow, title, lead, align = "start", light = false, 
         {lead && <p className={`section-lead ${light ? "!text-white/65" : ""}`}>{lead}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
-    </div>
+    </Reveal>
   );
 };
 

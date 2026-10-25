@@ -8,10 +8,12 @@ import PageHeader from "@/components/PageHeader";
 import { LuMail, LuPhone, LuMapPin, LuClock, LuSend } from "react-icons/lu";
 import { FaWhatsapp } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { WHATSAPP_DISPLAY, whatsappLink } from "@/lib/site";
 
 const contactDetails = [
   { icon: LuMapPin, label: "Office", value: "Beirut, Lebanon" },
   { icon: LuPhone, label: "Phone", value: "+961 1 234 567", href: "tel:+9611234567" },
+  { icon: FaWhatsapp, label: "WhatsApp", value: WHATSAPP_DISPLAY, href: whatsappLink() },
   { icon: LuMail, label: "Email", value: "info@lebestate.com", href: "mailto:info@lebestate.com" },
   { icon: LuClock, label: "Hours", value: "Mon – Sat, 9:00 – 18:00" },
 ];
@@ -85,7 +87,7 @@ const ContactPage = () => {
           </ul>
 
           <a
-            href="https://wa.me/9611234567"
+            href={whatsappLink("Hello, I'm interested in your properties.")}
             target="_blank"
             rel="noopener noreferrer"
             className="btn mt-6 w-full bg-[#25D366] text-white hover:bg-[#1fb658]"

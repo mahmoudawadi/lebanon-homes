@@ -4,6 +4,7 @@ import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LuSearchX } from "react-icons/lu";
 import PropertyCard from "./PropertyCard";
+import { Reveal } from "./Motion";
 
 const emptyText = {
   en: { title: "No properties found", body: "Try adjusting your filters or searching a different area." },
@@ -58,8 +59,10 @@ const PropertyGrid = ({ properties, loading, columns = 3 }: PropertyGridProps) =
     <div className={gridClass}>
       {properties
         .filter((p) => p && p.id)
-        .map((property) => (
-          <PropertyCard key={property.id} property={property} />
+        .map((property, i) => (
+          <Reveal key={property.id} delay={(i % 3) * 0.08} className="flex">
+            <PropertyCard property={property} />
+          </Reveal>
         ))}
     </div>
   );

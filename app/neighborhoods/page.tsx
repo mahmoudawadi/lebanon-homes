@@ -4,6 +4,7 @@ import MainHeader from "@/components/MainHeader";
 import Footer from "@/components/Footer";
 import PageHeader from "@/components/PageHeader";
 import { LuArrowUpRight } from "react-icons/lu";
+import { Reveal } from "@/components/Motion";
 
 const neighborhoods = [
   {
@@ -53,12 +54,10 @@ const NeighborhoodsPage = () => {
       <section className="section">
         <div className="container-x grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {neighborhoods.map((n, i) => (
+            <Reveal key={n.name} delay={(i % 3) * 0.08} className={`flex ${i === 0 ? "lg:col-span-2" : ""}`}>
             <Link
-              key={n.name}
               href={`/properties?city=${encodeURIComponent(n.name)}`}
-              className={`group relative isolate flex min-h-[340px] flex-col justify-end overflow-hidden rounded-2xl p-7 text-white shadow-soft ${
-                i === 0 ? "lg:col-span-2" : ""
-              }`}
+              className="group relative isolate flex min-h-[340px] w-full flex-col justify-end overflow-hidden rounded-3xl p-7 text-white shadow-soft"
             >
               <img
                 src={n.image}
@@ -73,6 +72,7 @@ const NeighborhoodsPage = () => {
               <h2 className="font-serif text-3xl font-semibold !text-white">{n.name}</h2>
               <p className="mt-1 max-w-sm text-white/75">{n.tagline}</p>
             </Link>
+            </Reveal>
           ))}
         </div>
       </section>

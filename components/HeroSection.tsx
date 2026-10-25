@@ -1,14 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LuSearch, LuMapPin, LuHouse, LuDollarSign } from "react-icons/lu";
+import { LuSearch, LuMapPin, LuHouse, LuDollarSign, LuStar, LuArrowUpRight, LuChevronDown } from "react-icons/lu";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { FALLBACK_IMAGE, displayPriceUSD, formatMoney, parseImages } from "@/lib/format";
 
 const translations = {
   en: {
     eyebrow: "Lebanon's trusted property partner",
-    title: "Find Your Perfect Home",
+    title: "Find Your",
+    highlight: "Perfect Home",
+    newListing: "Featured listing",
+    clients: "happy clients",
+    rated: "Rated 4.9 by our clients",
     subtitle: "Buy & Rent Properties Across Lebanon — from Beirut penthouses to mountain villas.",
     searchPlaceholder: "City or neighborhood",
     location: "Location",
@@ -27,7 +34,11 @@ const translations = {
   },
   ar: {
     eyebrow: "شريكك العقاري الموثوق في لبنان",
-    title: "ابحث عن عقارك المثالي",
+    title: "ابحث عن عقارك",
+    highlight: "المثالي",
+    newListing: "عقار مميز",
+    clients: "عميل سعيد",
+    rated: "تقييم 4.9 من عملائنا",
     subtitle: "شراء وإيجار العقارات في لبنان — من شقق بيروت الفاخرة إلى فيلات الجبل.",
     searchPlaceholder: "المدينة أو الحي",
     location: "الموقع",
@@ -46,7 +57,11 @@ const translations = {
   },
   fr: {
     eyebrow: "Votre partenaire immobilier au Liban",
-    title: "Trouvez Votre Propriété Parfaite",
+    title: "Trouvez Votre",
+    highlight: "Propriété Parfaite",
+    newListing: "Annonce vedette",
+    clients: "clients satisfaits",
+    rated: "Noté 4.9 par nos clients",
     subtitle: "Acheter et Louer des Propriétés au Liban — des penthouses de Beyrouth aux villas de montagne.",
     searchPlaceholder: "Ville ou quartier",
     location: "Emplacement",
@@ -79,6 +94,16 @@ const HeroSection = () => {
   const [propertyType, setPropertyType] = useState("");
   const [listingType, setListingType] = useState<"sale" | "rent">("sale");
   const [maxPrice, setMaxPrice] = useState("");
+  const [spotlight, setSpotlight] = useState<any>(null);
+  const { currency, convertPrice } = useCurrency();
+
+  // Show the top featured listing in the floating card
+  useEffect(() => {
+    fetch("/api/properties?featured=true&limit=1")
+      .then((res) => res.json())
+      .then((data) => setSpotlight(data.properties?.[0] || null))
+      .catch(() => setSpotlight(null));
+  }, []);
 
   const t = translations[language];
 
@@ -100,7 +125,7 @@ const HeroSection = () => {
           muted
           playsInline
           poster="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2400&q=80"
-          className="h-full w-full object-cover"
+          className="animate-kenburns h-full w-full object-cover"
         >
           <source src="/videos/luxury-skyline.mp4" type="video/mp4" />
         </video>
@@ -108,11 +133,58 @@ const HeroSection = () => {
         <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-900/60 to-transparent" />
       </div>
 
+      {/* Soft glowing accents */}
+      <div className="pointer-events-none absolute -start-32 top-1/3 -z-10 h-96 w-96 rounded-full bg-brass/25 blur-[120px]" />
+
+      {/* Floating cards (large screens) */}
+      <div className="pointer-events-none absolute inset-y-0 end-0 hidden w-[38%] xl:block">
+        {spotlight && (
+          <Link
+            href={`/property/${spotlight.slug}`}
+            className="glass animate-float pointer-events-auto absolute end-24 top-[16%] w-72 overflow-hidden rounded-3xl p-3 text-white shadow-2xl transition hover:bg-white/20"
+          >
+            <div className="relative h-36 overflow-hidden rounded-2xl">
+              <img src={parseImages(spotlight.images)[0] || FALLBACK_IMAGE} alt="" className="h-full w-full object-cover" />
+              <span className="chip absolute start-3 top-3 bg-brass text-white">{t.newListing}</span>
+            </div>
+            <div className="flex items-end justify-between gap-2 px-1.5 pb-1 pt-3">
+              <div className="min-w-0">
+                <div className="truncate text-sm font-semibold">{spotlight.title}</div>
+                <div className="font-serif text-xl text-brass-400">
+                  {formatMoney(convertPrice(displayPriceUSD(spotlight)), currency)}
+                </div>
+              </div>
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-ink">
+                <LuArrowUpRight className="h-4 w-4" />
+              </span>
+            </div>
+          </Link>
+        )}
+        <div className="glass animate-float-slow absolute end-10 top-[58%] flex items-center gap-3 rounded-2xl px-4 py-3 text-white shadow-2xl">
+          <div className="flex -space-x-2 rtl:space-x-reverse">
+            {["photo-1494790108377-be9c29b29330", "photo-1507003211169-0a1dd7228f2d", "photo-1438761681033-6461ffad8d80"].map((id) => (
+              <img
+                key={id}
+                src={`https://images.unsplash.com/${id}?w=80&h=80&fit=crop`}
+                alt=""
+                className="h-9 w-9 rounded-full object-cover ring-2 ring-ink"
+              />
+            ))}
+          </div>
+          <div>
+            <div className="text-sm font-semibold">1000+ {t.clients}</div>
+            <div className="flex items-center gap-1 text-xs text-white/70">
+              <LuStar className="h-3 w-3 fill-brass-400 text-brass-400" /> {t.rated}
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="container-x flex min-h-[calc(100svh-112px)] flex-col justify-center py-20 md:py-28">
         <div className="max-w-3xl animate-fade-up">
           <span className="eyebrow !text-brass-400">{t.eyebrow}</span>
           <h1 className="mt-6 font-serif text-5xl font-semibold leading-[1.05] !text-white sm:text-6xl lg:text-7xl">
-            {t.title}
+            {t.title} <span className="text-gradient italic">{t.highlight}</span>
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75 md:text-xl">{t.subtitle}</p>
         </div>
@@ -123,7 +195,7 @@ const HeroSection = () => {
             e.preventDefault();
             search();
           }}
-          className="mt-12 max-w-5xl animate-fade-up [animation-delay:150ms]"
+          className="mt-12 max-w-5xl animate-fade-up [animation-delay:150ms] xl:max-w-3xl"
         >
           <div className="inline-flex rounded-t-2xl bg-white/95 p-1.5 pb-0 backdrop-blur">
             {(["sale", "rent"] as const).map((type) => (
@@ -219,6 +291,14 @@ const HeroSection = () => {
           </div>
         </form>
       </div>
+
+      <a
+        href="#featured"
+        aria-label="Scroll down"
+        className="absolute bottom-6 start-1/2 hidden -translate-x-1/2 text-white/60 transition hover:text-white md:block rtl:translate-x-1/2"
+      >
+        <LuChevronDown className="h-6 w-6 animate-bounce" />
+      </a>
     </section>
   );
 };

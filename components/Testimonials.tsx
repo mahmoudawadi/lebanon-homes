@@ -4,6 +4,7 @@ import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { LuStar, LuQuote } from "react-icons/lu";
 import SectionHeading from "./SectionHeading";
+import { Reveal } from "./Motion";
 
 const testimonials = {
   en: [
@@ -40,8 +41,9 @@ const Testimonials = () => {
         <SectionHeading eyebrow={h.eyebrow} title={h.title} align="center" />
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {items.map((testimonial) => (
-            <figure key={testimonial.name} className="card relative flex flex-col p-8 transition hover:shadow-lift">
+          {items.map((testimonial, i) => (
+            <Reveal key={testimonial.name} delay={i * 0.1} className="flex">
+            <figure className="card relative flex w-full flex-col rounded-3xl p-8 transition duration-500 hover:-translate-y-1.5 hover:shadow-lift">
               <LuQuote className="absolute end-8 top-8 h-10 w-10 text-brass-100" />
               <div className="flex gap-0.5">
                 {Array.from({ length: testimonial.rating }).map((_, i) => (
@@ -61,6 +63,7 @@ const Testimonials = () => {
                 </span>
               </figcaption>
             </figure>
+            </Reveal>
           ))}
         </div>
       </div>

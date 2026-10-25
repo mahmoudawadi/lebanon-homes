@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { LuMapPin, LuBedDouble, LuBath, LuRuler, LuWaves, LuStar } from "react-icons/lu";
+import { LuMapPin, LuBedDouble, LuBath, LuRuler, LuWaves, LuStar, LuArrowUpRight } from "react-icons/lu";
 import { FALLBACK_IMAGE, displayPriceUSD, formatMoney, localizedField, parseImages } from "@/lib/format";
 
 const labels = {
@@ -30,7 +30,7 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
   return (
     <Link
       href={`/property/${property.slug || property.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-lift"
+      className="group flex w-full flex-col overflow-hidden rounded-3xl border border-line bg-white shadow-soft transition-all duration-500 hover:-translate-y-1.5 hover:border-brass/40 hover:shadow-lift"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-ivory-200">
         <img
@@ -52,6 +52,10 @@ const PropertyCard = ({ property }: PropertyCardProps) => {
             </span>
           )}
         </div>
+
+        <span className="absolute end-4 top-4 grid h-10 w-10 translate-y-2 place-items-center rounded-full bg-white text-ink opacity-0 shadow-soft transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+          <LuArrowUpRight className="h-4 w-4 rtl:-scale-x-100" />
+        </span>
 
         {property.seaView && (
           <span className="chip absolute bottom-4 start-4 bg-white/15 text-white ring-1 ring-white/30 backdrop-blur">

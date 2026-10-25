@@ -1,79 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { buildPropertyWhere } from '@/lib/property-search';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const city = searchParams.get('city');
-    const propertyType = searchParams.get('type');
-    const minPrice = searchParams.get('minPrice');
-    const maxPrice = searchParams.get('maxPrice');
-    const minSize = searchParams.get('minSize');
-    const maxSize = searchParams.get('maxSize');
-    const seaView = searchParams.get('seaView');
-    const hasSolar = searchParams.get('hasSolar');
-    const hasGenerator = searchParams.get('hasGenerator');
-    const featured = searchParams.get('featured');
-    const listingType = searchParams.get('listingType');
-    const bedrooms = searchParams.get('bedrooms');
-    const status = searchParams.get('status') || 'available';
+    const num = (key: string) => {
+      const value = searchParams.get(key);
+      return value ? parseFloat(value) : null;
+    };
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
     const skip = (page - 1) * limit;
 
-    // Build filter object
-    const where: any = {
-      status,
-    };
-
-    if (city) {
-      where.city = { contains: city };
-    }
-
-    if (propertyType) {
-      where.propertyType = propertyType;
-    }
-
-    if (minPrice || maxPrice) {
-      // Rentals are priced per month, so filter on the rent price instead
-      const priceField = listingType === 'rent' ? 'rentPriceUSD' : 'priceUSD';
-      where[priceField] = {};
-      if (minPrice) where[priceField].gte = parseFloat(minPrice);
-      if (maxPrice) where[priceField].lte = parseFloat(maxPrice);
-    }
-
-    if (bedrooms) {
-      const beds = parseInt(bedrooms);
-      // "4" means 4 or more
-      where.bedrooms = beds >= 4 ? { gte: beds } : beds;
-    }
-
-    if (minSize || maxSize) {
-      where.areaSqm = {};
-      if (minSize) where.areaSqm.gte = parseFloat(minSize);
-      if (maxSize) where.areaSqm.lte = parseFloat(maxSize);
-    }
-
-    if (seaView === 'true') {
-      where.seaView = true;
-    }
-
-    if (hasSolar === 'true') {
-      where.hasSolar = true;
-    }
-
-    if (hasGenerator === 'true') {
-      where.hasGenerator = true;
-    }
-
-    if (featured === 'true') {
-      where.featured = true;
-    }
-
-    if (listingType) {
-      // Listings marked "both" are available for sale and for rent
-      where.listingType = listingType === 'both' ? 'both' : { in: [listingType, 'both'] };
-    }
+    const where = buildPropertyWhere({
+      city: searchParams.get('city'),
+      propertyType: searchParams.get('type'),
+      listingType: searchParams.get('listingType'),
+      minPrice: num('minPrice'),
+      maxPrice: num('maxPrice'),
+      minSize: num('minSize'),
+      maxSize: num('maxSize'),
+      bedrooms: num('bedrooms'),
+      seaView: searchParams.get('seaView') === 'true',
+      hasSolar: searchParams.get('hasSolar') === 'true',
+      hasGenerator: searchParams.get('hasGenerator') === 'true',
+      featured: searchParams.get('featured') === 'true',
+      status: searchParams.get('status'),
+    });
 
     // Fetch properties with agent relation
     const [properties, total] = await Promise.all([

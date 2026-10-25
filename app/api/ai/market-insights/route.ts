@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+// Always compute from live data instead of caching the result at build time
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // AI-powered market insights
@@ -14,8 +17,15 @@ export async function GET(request: NextRequest) {
       ? saleProperties.reduce((sum, p) => sum + (p.priceUSD || 0), 0) / saleProperties.length
       : 0;
 
-    // Calculate price trend (simplified - in production, use historical data)
-    const priceChange = Math.random() * 10 - 5; // -5% to +5% (simulated)
+    // Price trend: average price per m² of the last 30 days' listings vs. older ones
+    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const avgPerSqm = (list: typeof saleProperties) =>
+      list.length > 0
+        ? list.reduce((sum, p) => sum + p.priceUSD / (p.areaSqm || 1), 0) / list.length
+        : 0;
+    const recentAvg = avgPerSqm(saleProperties.filter((p) => new Date(p.createdAt) >= cutoff));
+    const olderAvg = avgPerSqm(saleProperties.filter((p) => new Date(p.createdAt) < cutoff));
+    const priceChange = recentAvg && olderAvg ? ((recentAvg - olderAvg) / olderAvg) * 100 : 0;
 
     // Find hot areas (cities with most listings)
     const cityCounts: Record<string, number> = {};

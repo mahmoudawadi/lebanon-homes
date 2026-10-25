@@ -2,102 +2,65 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { FiStar } from "react-icons/fi";
+import { LuStar, LuQuote } from "react-icons/lu";
+import SectionHeading from "./SectionHeading";
+
+const testimonials = {
+  en: [
+    { name: "Sarah Johnson", role: "Property Buyer", text: "LebEstate made finding our dream home effortless. Their expertise and attention to detail is unmatched.", rating: 5 },
+    { name: "Michael Chen", role: "Investor", text: "The team's knowledge of the Lebanese market helped me make the perfect investment decision.", rating: 5 },
+    { name: "Emma Williams", role: "Property Seller", text: "Professional service from start to finish. They sold my property within weeks at the best price.", rating: 5 },
+  ],
+  ar: [
+    { name: "سارة جونسون", role: "مشترية عقار", text: "جعل LebEstate العثور على منزل أحلامنا أمرًا سهلاً. خبرتهم والاهتمام بالتفاصيل لا مثيل له.", rating: 5 },
+    { name: "مايكل تشن", role: "مستثمر", text: "ساعدت معرفة الفريق بسوق لبنان في اتخاذ قرار الاستثمار المثالي.", rating: 5 },
+    { name: "إيما ويليامز", role: "بائعة عقار", text: "خدمة احترافية من البداية إلى النهاية. باعوا عقاري في غضون أسابيع بأفضل سعر.", rating: 5 },
+  ],
+  fr: [
+    { name: "Sarah Johnson", role: "Acheteuse", text: "LebEstate a rendu la recherche de notre maison de rêve sans effort. Leur expertise et leur attention aux détails sont inégalées.", rating: 5 },
+    { name: "Michael Chen", role: "Investisseur", text: "La connaissance de l'équipe du marché libanais m'a aidé à prendre la décision d'investissement parfaite.", rating: 5 },
+    { name: "Emma Williams", role: "Vendeuse", text: "Service professionnel du début à la fin. Ils ont vendu ma propriété en quelques semaines au meilleur prix.", rating: 5 },
+  ],
+};
+
+const headings = {
+  en: { eyebrow: "Testimonials", title: "What Our Clients Say" },
+  ar: { eyebrow: "آراء العملاء", title: "ماذا يقول عملاؤنا" },
+  fr: { eyebrow: "Témoignages", title: "Ce Que Disent Nos Clients" },
+};
 
 const Testimonials = () => {
   const { language } = useLanguage();
-
-  const testimonials = {
-    en: [
-      {
-        name: "Sarah Johnson",
-        role: "Property Buyer",
-        text: "LuxEstate made finding our dream home effortless. Their expertise and attention to detail is unmatched.",
-        rating: 5,
-      },
-      {
-        name: "Michael Chen",
-        role: "Investor",
-        text: "The team's knowledge of the Lebanese market helped me make the perfect investment decision.",
-        rating: 5,
-      },
-      {
-        name: "Emma Williams",
-        role: "Property Seller",
-        text: "Professional service from start to finish. They sold my property within weeks at the best price.",
-        rating: 5,
-      },
-    ],
-    ar: [
-      {
-        name: "سارة جونسون",
-        role: "مشترية عقار",
-        text: "جعل LuxEstate العثور على منزل أحلامنا أمرًا سهلاً. خبرتهم والاهتمام بالتفاصيل لا مثيل له.",
-        rating: 5,
-      },
-      {
-        name: "مايكل تشن",
-        role: "مستثمر",
-        text: "ساعدت معرفة الفريق بسوق لبنان في اتخاذ قرار الاستثمار المثالي.",
-        rating: 5,
-      },
-      {
-        name: "إيما ويليامز",
-        role: "بائعة عقار",
-        text: "خدمة احترافية من البداية إلى النهاية. باعوا عقاري في غضون أسابيع بأفضل سعر.",
-        rating: 5,
-      },
-    ],
-    fr: [
-      {
-        name: "Sarah Johnson",
-        role: "Acheteuse",
-        text: "LuxEstate a rendu la recherche de notre maison de rêve sans effort. Leur expertise et leur attention aux détails sont inégalées.",
-        rating: 5,
-      },
-      {
-        name: "Michael Chen",
-        role: "Investisseur",
-        text: "La connaissance de l'équipe du marché libanais m'a aidé à prendre la décision d'investissement parfaite.",
-        rating: 5,
-      },
-      {
-        name: "Emma Williams",
-        role: "Vendeuse",
-        text: "Service professionnel du début à la fin. Ils ont vendu ma propriété en quelques semaines au meilleur prix.",
-        rating: 5,
-      },
-    ],
-  };
-
-  const t = testimonials[language];
+  const items = testimonials[language];
+  const h = headings[language];
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif font-bold text-estate-dark mb-4">
-            {language === "en" ? "What Our Clients Say" : language === "ar" ? "ماذا يقول عملاؤنا" : "Ce Que Disent Nos Clients"}
-          </h2>
-        </div>
+    <section className="section">
+      <div className="container-x">
+        <SectionHeading eyebrow={h.eyebrow} title={h.title} align="center" />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {t.map((testimonial, index) => (
-            <div
-              key={index}
-              className="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition-all border border-gray-100"
-            >
-              <div className="flex gap-1 mb-4">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <FiStar key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {items.map((testimonial) => (
+            <figure key={testimonial.name} className="card relative flex flex-col p-8 transition hover:shadow-lift">
+              <LuQuote className="absolute end-8 top-8 h-10 w-10 text-brass-100" />
+              <div className="flex gap-0.5">
+                {Array.from({ length: testimonial.rating }).map((_, i) => (
+                  <LuStar key={i} className="h-4 w-4 fill-brass text-brass" />
                 ))}
               </div>
-              <p className="text-gray-600 mb-6 italic">"{testimonial.text}"</p>
-              <div>
-                <div className="font-semibold text-estate-dark">{testimonial.name}</div>
-                <div className="text-sm text-gray-500">{testimonial.role}</div>
-              </div>
-            </div>
+              <blockquote className="mt-6 flex-1 font-serif text-lg leading-relaxed text-ink">
+                &ldquo;{testimonial.text}&rdquo;
+              </blockquote>
+              <figcaption className="mt-8 flex items-center gap-3 border-t border-line pt-6">
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-ink font-serif text-lg text-white">
+                  {testimonial.name[0]}
+                </span>
+                <span>
+                  <span className="block font-semibold">{testimonial.name}</span>
+                  <span className="block text-sm text-muted">{testimonial.role}</span>
+                </span>
+              </figcaption>
+            </figure>
           ))}
         </div>
       </div>
@@ -106,4 +69,3 @@ const Testimonials = () => {
 };
 
 export default Testimonials;
-

@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { city, propertyType, bedrooms, bathrooms, areaSqm, listingType } = body;
+    const { city, propertyType, bedrooms, areaSqm, listingType, excludeId } = body;
 
     // AI-powered price prediction based on similar properties
     // This uses a simple algorithm - in production, you'd use ML models
@@ -13,7 +13,9 @@ export async function POST(request: NextRequest) {
       where: {
         AND: [
           { status: 'available' },
-          { city: { contains: city, mode: 'insensitive' } },
+          // Don't compare a property against itself
+          ...(excludeId ? [{ id: { not: excludeId } }] : []),
+          { city: { contains: city } },
           { propertyType },
           { listingType },
           { bedrooms: { gte: bedrooms - 1, lte: bedrooms + 1 } },
@@ -31,22 +33,18 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Calculate average price
-    const prices = similarProperties.map((p) => 
-      listingType === 'rent' ? (p.rentPriceUSD || p.priceUSD || 0) : (p.priceUSD || 0)
-    );
-    
-    const avgPrice = prices.reduce((sum, price) => sum + price, 0) / prices.length;
-    
+    // Average price per square metre across comparable properties
+    const pricesPerSqm = similarProperties.map((p) => {
+      const price = listingType === 'rent' ? (p.rentPriceUSD || p.priceUSD || 0) : (p.priceUSD || 0);
+      return price / (p.areaSqm || areaSqm);
+    });
+    const avgPricePerSqm = pricesPerSqm.reduce((sum, v) => sum + v, 0) / pricesPerSqm.length;
+
     // Calculate confidence based on number of similar properties
     const confidence = Math.min(95, 50 + (similarProperties.length * 3));
 
-    // Adjust based on features (simplified algorithm)
-    let adjustedPrice = avgPrice;
-    
-    // Adjust for size difference
-    const sizeRatio = areaSqm / (similarProperties[0]?.areaSqm || areaSqm);
-    adjustedPrice = adjustedPrice * sizeRatio;
+    // Scale to the size of this property
+    const adjustedPrice = avgPricePerSqm * areaSqm;
 
     return NextResponse.json({
       estimatedPrice: Math.round(adjustedPrice),

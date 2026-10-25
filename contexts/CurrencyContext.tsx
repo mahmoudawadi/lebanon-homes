@@ -37,12 +37,10 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     // fetchExchangeRate();
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("currency", currency);
-  }, [currency]);
-
+  // Persist only explicit changes, so the initial default never overwrites the saved choice
   const setCurrency = (curr: Currency) => {
     setCurrencyState(curr);
+    localStorage.setItem("currency", curr);
   };
 
   const convertPrice = (usdPrice: number): number => {

@@ -17,10 +17,11 @@ const inter = Inter({
 const playfair = Playfair_Display({ 
   subsets: ["latin"],
   variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "Lebanon Real Estate | Buy & Rent Properties",
+  title: "LebEstate | Buy & Rent Properties in Lebanon",
   description: "Find your perfect property in Lebanon. Browse apartments, villas, and commercial spaces for sale and rent. Your trusted real estate partner.",
 };
 
@@ -39,7 +40,10 @@ export default function RootLayout({
                 {children}
                 <WhatsAppButton />
                 <AIChatbot />
-                <Toaster position="top-right" />
+                <Toaster
+                  position="top-right"
+                  toastOptions={{ style: { borderRadius: "12px", background: "#0f1b2d", color: "#fff", fontSize: "14px" } }}
+                />
               </AuthProvider>
             </CurrencyProvider>
           </LanguageProvider>

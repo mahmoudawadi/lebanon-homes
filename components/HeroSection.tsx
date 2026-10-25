@@ -1,214 +1,226 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { FiSearch, FiMapPin, FiHome, FiDollarSign } from "react-icons/fi";
+import { LuSearch, LuMapPin, LuHouse, LuDollarSign } from "react-icons/lu";
+
+const translations = {
+  en: {
+    eyebrow: "Lebanon's trusted property partner",
+    title: "Find Your Perfect Home",
+    subtitle: "Buy & Rent Properties Across Lebanon — from Beirut penthouses to mountain villas.",
+    searchPlaceholder: "City or neighborhood",
+    location: "Location",
+    propertyType: "Property Type",
+    buy: "Buy",
+    rent: "Rent",
+    maxPrice: "Max Price",
+    any: "Any price",
+    searchButton: "Search",
+    allTypes: "All Types",
+    apartment: "Apartment",
+    villa: "Villa",
+    penthouse: "Penthouse",
+    commercial: "Commercial",
+    popular: "Popular:",
+  },
+  ar: {
+    eyebrow: "شريكك العقاري الموثوق في لبنان",
+    title: "ابحث عن عقارك المثالي",
+    subtitle: "شراء وإيجار العقارات في لبنان — من شقق بيروت الفاخرة إلى فيلات الجبل.",
+    searchPlaceholder: "المدينة أو الحي",
+    location: "الموقع",
+    propertyType: "نوع العقار",
+    buy: "شراء",
+    rent: "إيجار",
+    maxPrice: "السعر الأقصى",
+    any: "أي سعر",
+    searchButton: "بحث",
+    allTypes: "جميع الأنواع",
+    apartment: "شقة",
+    villa: "فيلا",
+    penthouse: "بنتهاوس",
+    commercial: "تجاري",
+    popular: "الأكثر بحثاً:",
+  },
+  fr: {
+    eyebrow: "Votre partenaire immobilier au Liban",
+    title: "Trouvez Votre Propriété Parfaite",
+    subtitle: "Acheter et Louer des Propriétés au Liban — des penthouses de Beyrouth aux villas de montagne.",
+    searchPlaceholder: "Ville ou quartier",
+    location: "Emplacement",
+    propertyType: "Type de Propriété",
+    buy: "Acheter",
+    rent: "Louer",
+    maxPrice: "Prix Max",
+    any: "Tout prix",
+    searchButton: "Rechercher",
+    allTypes: "Tous les Types",
+    apartment: "Appartement",
+    villa: "Villa",
+    penthouse: "Penthouse",
+    commercial: "Commercial",
+    popular: "Populaire :",
+  },
+};
+
+const priceOptions = {
+  sale: [250000, 500000, 1000000, 2000000],
+  rent: [1000, 2000, 3500, 5000],
+};
+
+const popularCities = ["Beirut", "Jounieh", "Dbayeh", "Metn"];
 
 const HeroSection = () => {
-  const { language, isRTL } = useLanguage();
+  const { language } = useLanguage();
+  const router = useRouter();
   const [searchLocation, setSearchLocation] = useState("");
   const [propertyType, setPropertyType] = useState("");
-  const [listingType, setListingType] = useState<"buy" | "rent">("buy");
-  const [priceRange, setPriceRange] = useState([0, 10000000]);
-
-  const translations = {
-    en: {
-      title: "Find Your Perfect Home",
-      subtitle: "Buy & Rent Properties Across Lebanon",
-      searchPlaceholder: "Search by location...",
-      propertyType: "Property Type",
-      listingType: "I want to",
-      buy: "Buy",
-      rent: "Rent",
-      priceRange: "Price Range",
-      searchButton: "Search Properties",
-      allTypes: "All Types",
-      apartment: "Apartment",
-      villa: "Villa",
-      penthouse: "Penthouse",
-      commercial: "Commercial",
-    },
-    ar: {
-      title: "ابحث عن عقارك المثالي",
-      subtitle: "شراء وإيجار العقارات في لبنان",
-      searchPlaceholder: "ابحث حسب الموقع...",
-      propertyType: "نوع العقار",
-      listingType: "أريد",
-      buy: "شراء",
-      rent: "إيجار",
-      priceRange: "نطاق السعر",
-      searchButton: "ابحث عن العقارات",
-      allTypes: "جميع الأنواع",
-      apartment: "شقة",
-      villa: "فيلا",
-      penthouse: "بنتهاوس",
-      commercial: "تجاري",
-    },
-    fr: {
-      title: "Trouvez Votre Propriété Parfaite",
-      subtitle: "Acheter et Louer des Propriétés au Liban",
-      searchPlaceholder: "Rechercher par emplacement...",
-      propertyType: "Type de Propriété",
-      listingType: "Je veux",
-      buy: "Acheter",
-      rent: "Louer",
-      priceRange: "Gamme de Prix",
-      searchButton: "Rechercher des Propriétés",
-      allTypes: "Tous les Types",
-      apartment: "Appartement",
-      villa: "Villa",
-      penthouse: "Penthouse",
-      commercial: "Commercial",
-    },
-  };
+  const [listingType, setListingType] = useState<"sale" | "rent">("sale");
+  const [maxPrice, setMaxPrice] = useState("");
 
   const t = translations[language];
 
+  const search = (city = searchLocation) => {
+    const params = new URLSearchParams({ listingType });
+    if (city.trim()) params.set("city", city.trim());
+    if (propertyType) params.set("type", propertyType);
+    if (maxPrice) params.set("maxPrice", maxPrice);
+    router.push(`/properties?${params}`);
+  };
+
   return (
-    <section className="relative h-screen flex items-center justify-center overflow-hidden bg-black">
-      {/* Video Background */}
-      <div className="absolute inset-0 z-0">
+    <section className="relative isolate overflow-hidden bg-ink">
+      {/* Background */}
+      <div className="absolute inset-0 -z-10">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="w-full h-full object-cover opacity-30"
-          onError={(e) => {
-            // Fallback to background image if video fails to load
-            const target = e.target as HTMLVideoElement;
-            target.style.display = 'none';
-            const parent = target.parentElement;
-            if (parent) {
-              parent.style.backgroundImage = 'url(https://images.unsplash.com/photo-1449824913935-59a10b8d2000?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80)';
-              parent.style.backgroundSize = 'cover';
-              parent.style.backgroundPosition = 'center';
-            }
-          }}
+          poster="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=2400&q=80"
+          className="h-full w-full object-cover"
         >
           <source src="/videos/luxury-skyline.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/80" />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink-900/90 via-ink-900/60 to-ink-900/20 rtl:bg-gradient-to-l" />
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-900/60 to-transparent" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 w-full h-full flex items-center">
-        <div className="max-w-4xl text-left">
-          <h1 className="text-6xl md:text-8xl lg:text-9xl font-serif font-bold text-white mb-6 leading-tight">
+      <div className="container-x flex min-h-[calc(100svh-112px)] flex-col justify-center py-20 md:py-28">
+        <div className="max-w-3xl animate-fade-up">
+          <span className="eyebrow !text-brass-400">{t.eyebrow}</span>
+          <h1 className="mt-6 font-serif text-5xl font-semibold leading-[1.05] !text-white sm:text-6xl lg:text-7xl">
             {t.title}
           </h1>
-          <p className="text-xl md:text-2xl lg:text-3xl text-white font-sans font-normal">
-            {t.subtitle}
-          </p>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75 md:text-xl">{t.subtitle}</p>
         </div>
 
-        {/* Search Box */}
-        <div className="max-w-5xl mx-auto bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl p-6 md:p-8 border border-white/20">
-          {/* Buy/Rent Toggle */}
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <span className="text-sm font-medium text-gray-700 mr-2">{t.listingType}:</span>
-            <button
-              onClick={() => setListingType("buy")}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-                listingType === "buy"
-                  ? "bg-estate-primary text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {t.buy}
-            </button>
-            <button
-              onClick={() => setListingType("rent")}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all ${
-                listingType === "rent"
-                  ? "bg-estate-secondary text-white shadow-lg"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {t.rent}
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            {/* Location Search */}
-            <div className="relative">
-              <FiMapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder={t.searchPlaceholder}
-                value={searchLocation}
-                onChange={(e) => setSearchLocation(e.target.value)}
-                className={`w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary transition-all ${
-                  isRTL ? "text-right" : "text-left"
+        {/* Search panel */}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            search();
+          }}
+          className="mt-12 max-w-5xl animate-fade-up [animation-delay:150ms]"
+        >
+          <div className="inline-flex rounded-t-2xl bg-white/95 p-1.5 pb-0 backdrop-blur">
+            {(["sale", "rent"] as const).map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => {
+                  setListingType(type);
+                  setMaxPrice("");
+                }}
+                className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition-colors ${
+                  listingType === type ? "bg-ink text-white" : "text-ink-500 hover:text-ink"
                 }`}
-                dir={isRTL ? "rtl" : "ltr"}
-              />
-            </div>
-
-            {/* Property Type */}
-            <div className="relative">
-              <FiHome className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select
-                value={propertyType}
-                onChange={(e) => setPropertyType(e.target.value)}
-                className={`w-full pl-10 pr-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-luxury-gold appearance-none bg-white ${
-                  isRTL ? "text-right" : "text-left"
-                }`}
-                dir={isRTL ? "rtl" : "ltr"}
               >
-                <option value="">{t.allTypes}</option>
-                <option value="apartment">{t.apartment}</option>
-                <option value="villa">{t.villa}</option>
-                <option value="penthouse">{t.penthouse}</option>
-                <option value="commercial">{t.commercial}</option>
-              </select>
-            </div>
+                {type === "sale" ? t.buy : t.rent}
+              </button>
+            ))}
+          </div>
 
-            {/* Price Range Display */}
-            <div className="relative">
-              <FiDollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <div className="pl-10 pr-4 py-3 border border-gray-300 rounded-md bg-gray-50">
-                <span className="text-sm text-gray-600">
-                  {t.priceRange}: ${priceRange[0].toLocaleString()} - ${priceRange[1].toLocaleString()}
-                </span>
-              </div>
+          <div className="grid gap-2 rounded-2xl rounded-ss-none bg-white p-3 shadow-lift md:grid-cols-[1.4fr_1fr_1fr_auto] md:gap-0 md:divide-x md:divide-line rtl:md:divide-x-reverse">
+            <label className="flex items-center gap-3 rounded-xl px-4 py-2.5 transition hover:bg-ivory md:rounded-none">
+              <LuMapPin className="h-5 w-5 shrink-0 text-brass" />
+              <span className="flex-1">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-muted">{t.location}</span>
+                <input
+                  type="text"
+                  placeholder={t.searchPlaceholder}
+                  value={searchLocation}
+                  onChange={(e) => setSearchLocation(e.target.value)}
+                  className="w-full bg-transparent text-sm font-medium text-ink placeholder:text-ink/40 focus:outline-none"
+                />
+              </span>
+            </label>
+
+            <label className="flex items-center gap-3 rounded-xl px-4 py-2.5 transition hover:bg-ivory md:rounded-none">
+              <LuHouse className="h-5 w-5 shrink-0 text-brass" />
+              <span className="flex-1">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-muted">{t.propertyType}</span>
+                <select
+                  value={propertyType}
+                  onChange={(e) => setPropertyType(e.target.value)}
+                  className="w-full cursor-pointer appearance-none bg-transparent text-sm font-medium text-ink focus:outline-none"
+                >
+                  <option value="">{t.allTypes}</option>
+                  <option value="apartment">{t.apartment}</option>
+                  <option value="villa">{t.villa}</option>
+                  <option value="penthouse">{t.penthouse}</option>
+                  <option value="commercial">{t.commercial}</option>
+                </select>
+              </span>
+            </label>
+
+            <label className="flex items-center gap-3 rounded-xl px-4 py-2.5 transition hover:bg-ivory md:rounded-none">
+              <LuDollarSign className="h-5 w-5 shrink-0 text-brass" />
+              <span className="flex-1">
+                <span className="block text-[11px] font-semibold uppercase tracking-wider text-muted">{t.maxPrice}</span>
+                <select
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                  className="w-full cursor-pointer appearance-none bg-transparent text-sm font-medium text-ink focus:outline-none"
+                >
+                  <option value="">{t.any}</option>
+                  {priceOptions[listingType].map((p) => (
+                    <option key={p} value={p}>
+                      ${p.toLocaleString("en-US")}
+                      {listingType === "rent" ? " / mo" : ""}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            </label>
+
+            <div className="md:ps-3">
+              <button type="submit" className="btn-accent h-full w-full !rounded-xl !px-8 !py-4">
+                <LuSearch className="h-5 w-5" />
+                {t.searchButton}
+              </button>
             </div>
           </div>
 
-          {/* Price Slider */}
-          <div className="mb-6">
-            <input
-              type="range"
-              min="0"
-              max="10000000"
-              step="100000"
-              value={priceRange[1]}
-              onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-luxury-gold"
-            />
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-sm text-white/70">
+            <span>{t.popular}</span>
+            {popularCities.map((city) => (
+              <button
+                key={city}
+                type="button"
+                onClick={() => search(city)}
+                className="rounded-full border border-white/20 px-3 py-1 text-white/85 transition hover:border-white/50 hover:text-white"
+              >
+                {city}
+              </button>
+            ))}
           </div>
-
-          {/* Search Button */}
-          <button className={`w-full py-4 rounded-lg font-semibold text-lg transition-all shadow-lg flex items-center justify-center gap-2 ${
-            listingType === "buy" 
-              ? "bg-estate-primary text-white hover:bg-blue-700" 
-              : "bg-estate-secondary text-white hover:bg-green-600"
-          }`}>
-            <FiSearch className="w-5 h-5" />
-            {t.searchButton}
-          </button>
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-3 bg-white rounded-full" />
-        </div>
+        </form>
       </div>
     </section>
   );
 };
 
 export default HeroSection;
-

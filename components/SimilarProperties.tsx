@@ -1,39 +1,31 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import PropertyGrid from "./PropertyGrid";
+import SectionHeading from "./SectionHeading";
 
-const SimilarProperties = ({ propertyId }: any) => {
-  const [properties, setProperties] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+const translations = {
+  en: { eyebrow: "You may also like", title: "Similar Properties" },
+  ar: { eyebrow: "قد يعجبك أيضاً", title: "عقارات مشابهة" },
+  fr: { eyebrow: "Vous aimerez aussi", title: "Propriétés Similaires" },
+};
 
-  useEffect(() => {
-    fetch("/api/properties?limit=3")
-      .then((res) => res.json())
-      .then((data) => {
-        const filtered = (data.properties || []).filter(
-          (p: any) => p.id !== propertyId
-        );
-        setProperties(filtered.slice(0, 3));
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, [propertyId]);
+// Similar listings (same city or type) come from the property detail API
+const SimilarProperties = ({ properties }: { properties: any[] }) => {
+  const { language } = useLanguage();
+  if (!properties || properties.length === 0) return null;
 
-  if (properties.length === 0 && !loading) return null;
+  const t = translations[language];
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-4xl font-serif font-bold text-luxury-dark mb-8">
-          Similar Properties
-        </h2>
-        <PropertyGrid properties={properties} loading={loading} />
+    <section className="section border-t border-line bg-white">
+      <div className="container-x">
+        <SectionHeading eyebrow={t.eyebrow} title={t.title} />
+        <PropertyGrid properties={properties.slice(0, 3)} loading={false} />
       </div>
     </section>
   );
 };
 
 export default SimilarProperties;
-
-

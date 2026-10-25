@@ -11,18 +11,17 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black">
+    <main className="min-h-screen">
       <StickyTopBar />
       <MainHeader />
       <HeroSection />
+      <MarketPulse />
       <FeaturedListings />
       <AIPropertyRecommendations />
-      <AIMarketInsights />
       <WhyChooseUs />
-      <MarketPulse />
+      <AIMarketInsights />
       <Testimonials />
       <Footer />
     </main>
   );
 }
-

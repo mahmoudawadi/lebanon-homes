@@ -27,11 +27,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     // Update document direction and lang attribute
     document.documentElement.lang = language;
     document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-    localStorage.setItem("language", language);
   }, [language]);
 
+  // Persist only explicit changes, so the initial default never overwrites the saved choice
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
+    localStorage.setItem("language", lang);
   };
 
   const isRTL = language === "ar";

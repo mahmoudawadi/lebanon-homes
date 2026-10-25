@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     const hasGenerator = searchParams.get('hasGenerator');
     const featured = searchParams.get('featured');
     const listingType = searchParams.get('listingType');
+    const bedrooms = searchParams.get('bedrooms');
     const status = searchParams.get('status') || 'available';
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     };
 
     if (city) {
-      where.city = { contains: city, mode: 'insensitive' };
+      where.city = { contains: city };
     }
 
     if (propertyType) {
@@ -34,9 +35,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (minPrice || maxPrice) {
-      where.priceUSD = {};
-      if (minPrice) where.priceUSD.gte = parseFloat(minPrice);
-      if (maxPrice) where.priceUSD.lte = parseFloat(maxPrice);
+      // Rentals are priced per month, so filter on the rent price instead
+      const priceField = listingType === 'rent' ? 'rentPriceUSD' : 'priceUSD';
+      where[priceField] = {};
+      if (minPrice) where[priceField].gte = parseFloat(minPrice);
+      if (maxPrice) where[priceField].lte = parseFloat(maxPrice);
+    }
+
+    if (bedrooms) {
+      const beds = parseInt(bedrooms);
+      // "4" means 4 or more
+      where.bedrooms = beds >= 4 ? { gte: beds } : beds;
     }
 
     if (minSize || maxSize) {
@@ -62,7 +71,8 @@ export async function GET(request: NextRequest) {
     }
 
     if (listingType) {
-      where.listingType = listingType;
+      // Listings marked "both" are available for sale and for rent
+      where.listingType = listingType === 'both' ? 'both' : { in: [listingType, 'both'] };
     }
 
     // Fetch properties with agent relation

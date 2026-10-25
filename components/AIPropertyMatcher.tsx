@@ -2,112 +2,150 @@
 
 import React, { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { FiTarget, FiCheckCircle } from "react-icons/fi";
+import { LuTarget, LuCircleCheck } from "react-icons/lu";
 import PropertyGrid from "./PropertyGrid";
+import SectionHeading from "./SectionHeading";
+
+const translations = {
+  en: {
+    eyebrow: "Smart matching",
+    title: "AI Property Matcher",
+    subtitle: "Find your perfect match in seconds",
+    budget: "Budget",
+    perMonth: "per month",
+    total: "total",
+    bedrooms: "Bedrooms",
+    any: "Any",
+    city: "City",
+    cityPlaceholder: "Beirut, Dbayeh, etc.",
+    iWant: "I want to",
+    buy: "Buy",
+    rent: "Rent",
+    find: "Find My Match",
+    matching: "Matching…",
+    results: "Properties Matched for You",
+    noResults: "No exact matches yet — try a higher budget or a different city.",
+  },
+  ar: {
+    eyebrow: "مطابقة ذكية",
+    title: "مطابق العقارات بالذكاء الاصطناعي",
+    subtitle: "ابحث عن مطابقتك المثالية في ثوانٍ",
+    budget: "الميزانية",
+    perMonth: "شهرياً",
+    total: "إجمالي",
+    bedrooms: "غرف النوم",
+    any: "أي",
+    city: "المدينة",
+    cityPlaceholder: "بيروت، ضبية، إلخ.",
+    iWant: "أريد",
+    buy: "شراء",
+    rent: "إيجار",
+    find: "ابحث عن مطابقي",
+    matching: "جارٍ المطابقة…",
+    results: "العقارات المطابقة لك",
+    noResults: "لا توجد نتائج مطابقة — جرّب ميزانية أعلى أو مدينة أخرى.",
+  },
+  fr: {
+    eyebrow: "Correspondance intelligente",
+    title: "Appariement de Propriétés IA",
+    subtitle: "Trouvez votre correspondance parfaite en quelques secondes",
+    budget: "Budget",
+    perMonth: "par mois",
+    total: "total",
+    bedrooms: "Chambres",
+    any: "Tous",
+    city: "Ville",
+    cityPlaceholder: "Beyrouth, Dbayeh, etc.",
+    iWant: "Je veux",
+    buy: "Acheter",
+    rent: "Louer",
+    find: "Trouver Ma Correspondance",
+    matching: "Recherche…",
+    results: "Propriétés Correspondant à Vos Critères",
+    noResults: "Aucune correspondance — essayez un budget plus élevé ou une autre ville.",
+  },
+};
 
 const AIPropertyMatcher = () => {
   const { language } = useLanguage();
-  const [matches, setMatches] = useState<any[]>([]);
+  const [matches, setMatches] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     budget: "",
     bedrooms: "",
     city: "",
-    listingType: "buy",
-    features: [] as string[],
+    listingType: "sale" as "sale" | "rent",
   });
-
-  const translations = {
-    en: {
-      title: "AI Property Matcher",
-      subtitle: "Find your perfect match in seconds",
-      budget: "Budget",
-      bedrooms: "Bedrooms",
-      city: "City",
-      features: "Must Have Features",
-      find: "Find My Match",
-      results: "Properties Matched for You",
-    },
-    ar: {
-      title: "مطابق العقارات بالذكاء الاصطناعي",
-      subtitle: "ابحث عن مطابقتك المثالية في ثوانٍ",
-      budget: "الميزانية",
-      bedrooms: "غرف النوم",
-      city: "المدينة",
-      features: "الميزات المطلوبة",
-      find: "ابحث عن مطابقي",
-      results: "العقارات المطابقة لك",
-    },
-    fr: {
-      title: "Appariement de Propriétés IA",
-      subtitle: "Trouvez votre correspondance parfaite en quelques secondes",
-      budget: "Budget",
-      bedrooms: "Chambres",
-      city: "Ville",
-      features: "Caractéristiques Requises",
-      find: "Trouver Ma Correspondance",
-      results: "Propriétés Correspondant à Vos Critères",
-    },
-  };
 
   const t = translations[language];
 
-  const handleFind = async () => {
+  const handleFind = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     try {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams({ listingType: formData.listingType });
       if (formData.budget) params.append("maxPrice", formData.budget);
       if (formData.bedrooms) params.append("bedrooms", formData.bedrooms);
       if (formData.city) params.append("city", formData.city);
-      params.append("listingType", formData.listingType);
 
       const response = await fetch(`/api/properties?${params}`);
       const data = await response.json();
       setMatches(data.properties || []);
     } catch (error) {
       console.error("Match error:", error);
+      setMatches([]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <FiTarget className="w-8 h-8 text-purple-600" />
-            <h2 className="text-4xl font-serif font-bold text-luxury-dark">
-              {t.title}
-            </h2>
-          </div>
-          <p className="text-gray-600">{t.subtitle}</p>
-        </div>
+    <section className="section border-t border-line bg-white">
+      <div className="container-x">
+        <SectionHeading eyebrow={t.eyebrow} title={t.title} lead={t.subtitle} align="center" />
 
-        <div className="max-w-4xl mx-auto bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl p-8 shadow-lg mb-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <form onSubmit={handleFind} className="card mx-auto mb-12 max-w-4xl bg-ivory-50 p-6 md:p-8">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t.budget} ({formData.listingType === "rent" ? "per month" : "total"})
+              <span className="label">{t.iWant}</span>
+              <div className="grid grid-cols-2 gap-1 rounded-xl bg-white p-1 ring-1 ring-line">
+                {(["sale", "rent"] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, listingType: type })}
+                    className={`rounded-lg py-2.5 text-sm font-semibold transition ${
+                      formData.listingType === type ? "bg-ink text-white" : "text-muted hover:text-ink"
+                    }`}
+                  >
+                    {type === "sale" ? t.buy : t.rent}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="label" htmlFor="match-budget">
+                {t.budget} ({formData.listingType === "rent" ? t.perMonth : t.total})
               </label>
               <input
+                id="match-budget"
                 type="number"
+                min={0}
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                placeholder={formData.listingType === "rent" ? "$800" : "$300,000"}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder={formData.listingType === "rent" ? "800" : "300000"}
+                className="input"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t.bedrooms}
-              </label>
+              <label className="label" htmlFor="match-beds">{t.bedrooms}</label>
               <select
+                id="match-beds"
                 value={formData.bedrooms}
                 onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="input cursor-pointer"
               >
-                <option value="">Any</option>
+                <option value="">{t.any}</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -115,64 +153,36 @@ const AIPropertyMatcher = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t.city}
-              </label>
+              <label className="label" htmlFor="match-city">{t.city}</label>
               <input
+                id="match-city"
                 type="text"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="Beirut, Dbayeh, etc."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder={t.cityPlaceholder}
+                className="input"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                I want to
-              </label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setFormData({ ...formData, listingType: "buy" })}
-                  className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
-                    formData.listingType === "buy"
-                      ? "bg-blue-600 text-white"
-                      : "bg-white text-gray-700 border border-gray-300"
-                  }`}
-                >
-                  Buy
-                </button>
-                <button
-                  onClick={() => setFormData({ ...formData, listingType: "rent" })}
-                  className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
-                    formData.listingType === "rent"
-                      ? "bg-green-600 text-white"
-                      : "bg-white text-gray-700 border border-gray-300"
-                  }`}
-                >
-                  Rent
-                </button>
-              </div>
-            </div>
           </div>
 
-          <button
-            onClick={handleFind}
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-          >
-            <FiTarget className="w-5 h-5" />
-            {loading ? "Matching..." : t.find}
+          <button type="submit" disabled={loading} className="btn-accent mt-6 w-full !py-4">
+            <LuTarget className="h-5 w-5" />
+            {loading ? t.matching : t.find}
           </button>
-        </div>
+        </form>
 
-        {matches.length > 0 && (
-          <div>
-            <h3 className="text-2xl font-bold text-luxury-dark mb-6 flex items-center gap-2">
-              <FiCheckCircle className="w-6 h-6 text-green-500" />
-              {t.results} ({matches.length})
-            </h3>
-            <PropertyGrid properties={matches} loading={false} />
-          </div>
+        {matches && (
+          matches.length > 0 ? (
+            <div>
+              <h3 className="mb-6 flex items-center gap-2 text-xl font-semibold">
+                <LuCircleCheck className="h-6 w-6 text-emerald-600" />
+                {t.results} ({matches.length})
+              </h3>
+              <PropertyGrid properties={matches} loading={false} />
+            </div>
+          ) : (
+            <p className="text-center text-muted">{t.noResults}</p>
+          )
         )}
       </div>
     </section>
@@ -180,5 +190,3 @@ const AIPropertyMatcher = () => {
 };
 
 export default AIPropertyMatcher;
-
-

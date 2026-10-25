@@ -16,16 +16,16 @@ export async function GET(request: NextRequest) {
       };
       
       if (city) {
-        where.properties.some.city = { contains: city, mode: 'insensitive' };
+        where.properties.some.city = { contains: city };
       }
     }
 
     if (specialty) {
-      where.specialties = { has: specialty };
+      where.specialties = { contains: specialty };
     }
 
     if (language) {
-      where.languages = { has: language };
+      where.languages = { contains: language };
     }
 
     const agents = await prisma.agent.findMany({

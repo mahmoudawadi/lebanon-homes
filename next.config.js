@@ -3,11 +3,10 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone', // For Docker deployment
   images: {
-    domains: [
-      'images.unsplash.com',
-      'via.placeholder.com',
-      'res.cloudinary.com', // If using Cloudinary
-      'yourdomain.com', // Your domain
+    remotePatterns: [
+      { protocol: 'https', hostname: 'images.unsplash.com' },
+      { protocol: 'https', hostname: 'via.placeholder.com' },
+      { protocol: 'https', hostname: 'res.cloudinary.com' }, // If using Cloudinary
     ],
     formats: ['image/avif', 'image/webp'],
   },

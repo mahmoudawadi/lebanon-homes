@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     } else if (lowerMessage.includes('beirut') || lowerMessage.includes('بيروت') || lowerMessage.includes('beyrouth')) {
       const beirutProperties = await prisma.property.findMany({
         where: {
-          city: { contains: 'Beirut', mode: 'insensitive' },
+          city: { contains: 'Beirut' },
           status: 'available',
         },
         take: 5,
@@ -100,10 +100,18 @@ export async function POST(request: NextRequest) {
         where: { status: 'available' },
       });
 
-      const avgPrice = allProperties.reduce((sum, p) => sum + (p.priceUSD || 0), 0) / allProperties.length;
-      const avgRent = allProperties
-        .filter((p) => p.listingType === 'rent' || p.listingType === 'both')
-        .reduce((sum, p) => sum + (p.rentPriceUSD || p.priceUSD || 0), 0) / allProperties.filter((p) => p.listingType === 'rent' || p.listingType === 'both').length;
+      const average = (values: number[]) =>
+        values.length > 0 ? values.reduce((sum, v) => sum + v, 0) / values.length : 0;
+      const avgPrice = average(
+        allProperties
+          .filter((p) => p.listingType === 'sale' || p.listingType === 'both')
+          .map((p) => p.priceUSD || 0)
+      );
+      const avgRent = average(
+        allProperties
+          .filter((p) => p.listingType === 'rent' || p.listingType === 'both')
+          .map((p) => p.rentPriceUSD || p.priceUSD || 0)
+      );
 
       response = language === 'en'
         ? `Based on our current listings:\n• Average sale price: $${Math.round(avgPrice).toLocaleString()}\n• Average rent: $${Math.round(avgRent).toLocaleString()}/month\n\nPrices vary by location, size, and features. Would you like to see properties in a specific price range?`

@@ -2,200 +2,258 @@
 
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useCurrency } from "@/contexts/CurrencyContext";
-import { FiX } from "react-icons/fi";
+import { LuSlidersHorizontal } from "react-icons/lu";
 
-const PropertyFilters = ({ filters, setFilters }: any) => {
+const translations = {
+  en: {
+    filters: "Filters",
+    listingType: "Listing Type",
+    buy: "Buy",
+    rent: "Rent",
+    location: "Location",
+    cityPlaceholder: "City...",
+    type: "Property Type",
+    price: "Price Range (USD)",
+    size: "Size (sqm)",
+    bedrooms: "Bedrooms",
+    any: "Any",
+    features: "Features",
+    seaView: "Sea View",
+    solar: "Solar",
+    generator: "Generator",
+    clear: "Clear All",
+    all: "All",
+    min: "Min",
+    max: "Max",
+    apartment: "Apartment",
+    villa: "Villa",
+    penthouse: "Penthouse",
+    commercial: "Commercial",
+  },
+  ar: {
+    filters: "المرشحات",
+    listingType: "نوع العرض",
+    buy: "شراء",
+    rent: "إيجار",
+    location: "الموقع",
+    cityPlaceholder: "المدينة...",
+    type: "نوع العقار",
+    price: "نطاق السعر (دولار)",
+    size: "الحجم (م²)",
+    bedrooms: "غرف النوم",
+    any: "أي",
+    features: "الميزات",
+    seaView: "إطلالة بحرية",
+    solar: "طاقة شمسية",
+    generator: "مولد",
+    clear: "مسح الكل",
+    all: "الكل",
+    min: "الأدنى",
+    max: "الأقصى",
+    apartment: "شقة",
+    villa: "فيلا",
+    penthouse: "بنتهاوس",
+    commercial: "تجاري",
+  },
+  fr: {
+    filters: "Filtres",
+    listingType: "Type d'annonce",
+    buy: "Acheter",
+    rent: "Louer",
+    location: "Emplacement",
+    cityPlaceholder: "Ville...",
+    type: "Type de Propriété",
+    price: "Gamme de Prix (USD)",
+    size: "Taille (m²)",
+    bedrooms: "Chambres",
+    any: "Tous",
+    features: "Caractéristiques",
+    seaView: "Vue Mer",
+    solar: "Solaire",
+    generator: "Générateur",
+    clear: "Tout Effacer",
+    all: "Tout",
+    min: "Min",
+    max: "Max",
+    apartment: "Appartement",
+    villa: "Villa",
+    penthouse: "Penthouse",
+    commercial: "Commercial",
+  },
+};
+
+interface PropertyFiltersProps {
+  filters: Record<string, string>;
+  setFilters: (filters: Record<string, string>) => void;
+}
+
+const PropertyFilters = ({ filters, setFilters }: PropertyFiltersProps) => {
   const { language } = useLanguage();
-  const { currency, convertPrice } = useCurrency();
+  const t = translations[language];
 
-  const handleFilterChange = (key: string, value: any) => {
+  const handleFilterChange = (key: string, value: string) => {
     setFilters({ ...filters, [key]: value });
   };
 
-  const clearFilters = () => {
-    setFilters({});
-  };
+  const activeCount = Object.values(filters).filter(Boolean).length;
 
-  const translations = {
-    en: {
-      filters: "Filters",
-      location: "Location",
-      type: "Property Type",
-      price: "Price Range",
-      size: "Size (sqm)",
-      features: "Features",
-      clear: "Clear All",
-      all: "All",
-    },
-    ar: { filters: "المرشحات", location: "الموقع", type: "نوع العقار", price: "نطاق السعر", size: "الحجم (م²)", features: "الميزات", clear: "مسح الكل", all: "الكل" },
-    fr: { filters: "Filtres", location: "Emplacement", type: "Type de Propriété", price: "Gamme de Prix", size: "Taille (m²)", features: "Caractéristiques", clear: "Tout Effacer", all: "Tout" },
-  };
-
-  const t = translations[language];
+  const features = [
+    { key: "seaView", label: t.seaView },
+    { key: "hasSolar", label: t.solar },
+    { key: "hasGenerator", label: t.generator },
+  ];
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24 border border-gray-100">
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-xl font-semibold text-luxury-dark">{t.filters}</h3>
-        <button
-          onClick={clearFilters}
-          className="text-sm text-luxury-gold hover:underline"
-        >
-          {t.clear}
-        </button>
+    <aside className="card p-6 lg:sticky lg:top-24">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-lg font-semibold">
+          <LuSlidersHorizontal className="h-4 w-4 text-brass" />
+          {t.filters}
+          {activeCount > 0 && (
+            <span className="grid h-5 min-w-5 place-items-center rounded-full bg-ink px-1.5 text-[11px] text-white">
+              {activeCount}
+            </span>
+          )}
+        </h3>
+        {activeCount > 0 && (
+          <button onClick={() => setFilters({})} className="text-sm font-medium text-brass-600 hover:underline">
+            {t.clear}
+          </button>
+        )}
       </div>
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t.listingType || "Listing Type"}
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => handleFilterChange("listingType", filters.listingType === "sale" ? "" : "sale")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filters.listingType === "sale"
-                  ? "bg-estate-primary text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {t.buy || "Buy"}
-            </button>
-            <button
-              onClick={() => handleFilterChange("listingType", filters.listingType === "rent" ? "" : "rent")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                filters.listingType === "rent"
-                  ? "bg-estate-secondary text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {t.rent || "Rent"}
-            </button>
+          <span className="label">{t.listingType}</span>
+          <div className="grid grid-cols-2 gap-1 rounded-xl bg-ivory p-1">
+            {(["sale", "rent"] as const).map((type) => (
+              <button
+                key={type}
+                onClick={() => handleFilterChange("listingType", filters.listingType === type ? "" : type)}
+                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                  filters.listingType === type ? "bg-white text-ink shadow-soft" : "text-muted hover:text-ink"
+                }`}
+              >
+                {type === "sale" ? t.buy : t.rent}
+              </button>
+            ))}
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t.location}
-          </label>
+          <label className="label" htmlFor="filter-city">{t.location}</label>
           <input
+            id="filter-city"
             type="text"
             value={filters.city || ""}
             onChange={(e) => handleFilterChange("city", e.target.value)}
-            placeholder="City..."
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-luxury-gold"
+            placeholder={t.cityPlaceholder}
+            className="input"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t.type}
-          </label>
+          <label className="label" htmlFor="filter-type">{t.type}</label>
           <select
+            id="filter-type"
             value={filters.type || ""}
             onChange={(e) => handleFilterChange("type", e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-luxury-gold"
+            className="input cursor-pointer"
           >
             <option value="">{t.all}</option>
-            <option value="apartment">Apartment</option>
-            <option value="villa">Villa</option>
-            <option value="penthouse">Penthouse</option>
-            <option value="commercial">Commercial</option>
+            <option value="apartment">{t.apartment}</option>
+            <option value="villa">{t.villa}</option>
+            <option value="penthouse">{t.penthouse}</option>
+            <option value="commercial">{t.commercial}</option>
           </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t.price}
-          </label>
-          <div className="space-y-2">
+          <span className="label">{t.bedrooms}</span>
+          <div className="grid grid-cols-5 gap-1.5">
+            {["", "1", "2", "3", "4"].map((beds) => (
+              <button
+                key={beds || "any"}
+                onClick={() => handleFilterChange("bedrooms", beds)}
+                className={`rounded-lg border py-2 text-sm font-medium transition ${
+                  (filters.bedrooms || "") === beds
+                    ? "border-ink bg-ink text-white"
+                    : "border-line bg-white text-ink-600 hover:border-ink/30"
+                }`}
+              >
+                {beds === "" ? t.any : beds === "4" ? "4+" : beds}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <span className="label">{t.price}</span>
+          <div className="grid grid-cols-2 gap-2">
             <input
               type="number"
+              min={0}
               value={filters.minPrice || ""}
               onChange={(e) => handleFilterChange("minPrice", e.target.value)}
-              placeholder="Min"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-luxury-gold"
+              placeholder={t.min}
+              className="input"
             />
             <input
               type="number"
+              min={0}
               value={filters.maxPrice || ""}
               onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
-              placeholder="Max"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-luxury-gold"
+              placeholder={t.max}
+              className="input"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t.size}
-          </label>
-          <div className="space-y-2">
+          <span className="label">{t.size}</span>
+          <div className="grid grid-cols-2 gap-2">
             <input
               type="number"
+              min={0}
               value={filters.minSize || ""}
               onChange={(e) => handleFilterChange("minSize", e.target.value)}
-              placeholder="Min sqm"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-luxury-gold"
+              placeholder={t.min}
+              className="input"
             />
             <input
               type="number"
+              min={0}
               value={filters.maxSize || ""}
               onChange={(e) => handleFilterChange("maxSize", e.target.value)}
-              placeholder="Max sqm"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-luxury-gold"
+              placeholder={t.max}
+              className="input"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t.features}
-          </label>
-          <div className="space-y-2">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.seaView === "true"}
-                onChange={(e) =>
-                  handleFilterChange("seaView", e.target.checked ? "true" : "")
-                }
-                className="mr-2"
-              />
-              <span className="text-sm">Sea View</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.hasSolar === "true"}
-                onChange={(e) =>
-                  handleFilterChange("hasSolar", e.target.checked ? "true" : "")
-                }
-                className="mr-2"
-              />
-              <span className="text-sm">Solar</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                checked={filters.hasGenerator === "true"}
-                onChange={(e) =>
-                  handleFilterChange(
-                    "hasGenerator",
-                    e.target.checked ? "true" : ""
-                  )
-                }
-                className="mr-2"
-              />
-              <span className="text-sm">Generator</span>
-            </label>
+          <span className="label">{t.features}</span>
+          <div className="flex flex-wrap gap-2">
+            {features.map((feature) => {
+              const active = filters[feature.key] === "true";
+              return (
+                <button
+                  key={feature.key}
+                  onClick={() => handleFilterChange(feature.key, active ? "" : "true")}
+                  aria-pressed={active}
+                  className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition ${
+                    active ? "border-brass bg-brass-50 text-brass-700" : "border-line bg-white text-ink-600 hover:border-ink/30"
+                  }`}
+                >
+                  {feature.label}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
-    </div>
+    </aside>
   );
 };
 
 export default PropertyFilters;
-

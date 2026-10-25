@@ -11,7 +11,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:seed": "tsx prisma/seed.ts",
+    "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
     "db:backup": "pg_dump $DATABASE_URL > backup_$(date +%Y%m%d).sql",
     "postinstall": "prisma generate"
@@ -41,5 +41,8 @@
     "tailwindcss": "^3.4.4",
     "tsx": "^4.16.2",
     "typescript": "^5.5.3"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }
